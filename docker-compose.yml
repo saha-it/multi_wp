@@ -27,14 +27,14 @@ services:
       WORDPRESS_DB_USER: wordpress_user1
       WORDPRESS_DB_PASSWORD: your_password_for_wp1 # 上記のデータベースパスワードと一致させてください
     volumes:
-      - france_content:/var/www/html
+      - ./france_content:/var/www/html
     ports:
       - "8001:80" # ホストのポート8001をコンテナの80にマッピング
 
   # --- WordPress 環境 2 ---
-  italy_db:
+  world_db:
     image: mysql:8.0
-    container_name: italy_db
+    container_name: world_db
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: your_root_password_for_wp2 # 好きなパスワードに変更してください
@@ -42,22 +42,22 @@ services:
       MYSQL_USER: wordpress_user2
       MYSQL_PASSWORD: your_password_for_wp2 # 好きなパスワードに変更してください
     volumes:
-      - italy_db_data:/var/lib/mysql
+      - world_db_data:/var/lib/mysql
     ports:
       - "33062:3306" # ホストのポート33062をコンテナの3306にマッピング
 
-  italy_app:
+  world_app:
     depends_on:
-      - italy_db
+      - world_db
     image: wordpress:latest
-    container_name: italy_app
+    container_name: world_app
     environment:
-      WORDPRESS_DB_HOST: italy_db:3306
+      WORDPRESS_DB_HOST: world_db:3306
       WORDPRESS_DB_NAME: wordpress_db2
       WORDPRESS_DB_USER: wordpress_user2
       WORDPRESS_DB_PASSWORD: your_password_for_wp2 # 上記のデータベースパスワードと一致させてください
     volumes:
-      - italy_content:/var/www/html
+      - ./world_content:/var/www/html
     ports:
       - "8002:80" # ホストのポート8002をコンテナの80にマッピング
 
@@ -87,7 +87,7 @@ services:
       WORDPRESS_DB_USER: wordpress_user3
       WORDPRESS_DB_PASSWORD: your_password_for_wp3 # 上記のデータベースパスワードと一致させてください
     volumes:
-      - america_content:/var/www/html
+      - ./america_content:/var/www/html
     ports:
       - "8003:80" # ホストのポート8003をコンテナの80にマッピング
 
@@ -97,10 +97,10 @@ services:
     container_name: phpmyadmin
     depends_on:
       - france_db # どのデータベースでも良いですが、依存関係として一つ指定します
-      - italy_db
+      - world_db
       - america_db
     environment:
-      PMA_HOSTS: france_db,italy_db,america_db # 複数のホストを指定
+      PMA_HOSTS: france_db,world_db,america_db # 複数のホストを指定
       MYSQL_ROOT_PASSWORD: your_root_password_for_wp1 # rootユーザーでアクセスするためのパスワード (任意のDBのrootパスワードを設定してください)
       UPLOAD_LIMIT: 64M # 必要に応じてアップロード制限を調整
       PMA_PORT: 3306 # コンテナ内のMySQLのポート
@@ -108,13 +108,13 @@ services:
       - "8080:80" # ホストのポート8080をphpMyAdminの80にマッピング
     links:
       - france_db
-      - italy_db
+      - world_db
       - america_db
 
 volumes:
   france_db_data:
   france_content:
-  italy_db_data:
-  italy_content:
+  world_db_data:
+  world_content:
   america_db_data:
   america_content:
